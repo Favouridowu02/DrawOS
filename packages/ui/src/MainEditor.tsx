@@ -943,7 +943,7 @@ export default function MainEditor({
           <img
             alt="DrawOS Mini Logo"
             className="w-5.5 h-5.5 rounded object-contain"
-            src="/apps/web/drawos.png"
+            src="/drawos.png"
           />
           <div className="flex flex-col">
             <span className="text-[11px] font-bold tracking-tight text-on-surface leading-none">{drawing.name}</span>

@@ -13,7 +13,7 @@ interface LandingPageProps {
 export function DrawOSLogo({ className = "w-6 h-6" }: { className?: string }) {
   return (
     <img 
-      src="/apps/web/drawos.png" 
+      src="/drawos.png" 
       alt="DrawOS Logo" 
       className={`${className} object-contain`} 
     />
@@ -265,7 +265,7 @@ export default function LandingPage({ onLaunchEditor, onLaunchWithTemplate }: La
               {/* Centered Drawing Logo Box */}
               <div className="w-24 h-24 bg-white border border-[#c3c6d7] rounded-2xl shadow-sm flex items-center justify-center mb-8 hover:border-[#004ac6] transition-colors duration-300">
                 <img
-                  src="/apps/web/drawos_no_background.png"
+                  src="/drawos_no_background.png"
                   alt="DrawOS Engine Logo"
                   className="w-16 h-16 object-contain"
                 />
