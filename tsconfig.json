@@ -1,0 +1,53 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false,
+    "module": "ESNext",
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "allowJs": true,
+    "jsx": "react-jsx",
+    "paths": {
+      "@/*": [
+        "./*"
+      ],
+      "@drawos/engine": [
+        "./packages/engine/src/index.ts"
+      ],
+      "@drawos/renderer": [
+        "./packages/renderer/src/index.ts"
+      ],
+      "@drawos/tools": [
+        "./packages/tools/src/index.ts"
+      ],
+      "@drawos/camera": [
+        "./packages/camera/src/index.ts"
+      ],
+      "@drawos/geometry": [
+        "./packages/geometry/src/index.ts"
+      ],
+      "@drawos/history": [
+        "./packages/history/src/index.ts"
+      ],
+      "@drawos/storage": [
+        "./packages/storage/src/index.ts"
+      ],
+      "@drawos/ui": [
+        "./packages/ui/src/index.ts"
+      ],
+      "@drawos/utils": [
+        "./packages/utils/src/index.ts"
+      ]
+    },
+    "allowImportingTsExtensions": true,
+    "noEmit": true
+  }
+}
