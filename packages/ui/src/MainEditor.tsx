@@ -1861,7 +1861,7 @@ export default function MainEditor({
                 )}
 
                 {/* Colors controls */}
-                {selectedObject.type !== 'path' && selectedObject.type !== 'text' && selectedObject.type !== 'image' && (
+                {selectedObject.type !== 'image' && (
                   <div className="space-y-3">
                     <label className="text-[10px] text-secondary font-semibold block">Fill Color</label>
                     
@@ -1871,8 +1871,7 @@ export default function MainEditor({
                         <button
                           key={idx}
                           onClick={() => {
-                            updateSelectedProperty('fill', col.value);
-                            pushHistory(objects);
+                            updateSelectedProperty('fill', col.value, true);
                           }}
                           className={`w-full aspect-square rounded border relative cursor-pointer ${
                             selectedObject.fill === col.value ? 'ring-2 ring-primary ring-offset-2' : 'border-outline-variant/60'
@@ -1889,54 +1888,77 @@ export default function MainEditor({
                       ))}
                     </div>
 
-                    {/* Custom Hex Fill */}
-                    <input
-                      type="text"
-                      value={selectedObject.fill}
-                      onChange={(e) => updateSelectedProperty('fill', e.target.value)}
-                      onBlur={handlePropertyChangeComplete}
-                      className="w-full text-xs font-mono bg-surface border border-outline-variant px-2 py-1 rounded"
-                    />
+                    {/* Custom Hex Fill + Visual Picker */}
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={selectedObject.fill?.startsWith('#') ? selectedObject.fill : '#2563eb'}
+                        onChange={(e) => updateSelectedProperty('fill', e.target.value)}
+                        onBlur={handlePropertyChangeComplete}
+                        className="w-8 h-7 rounded cursor-pointer border border-outline-variant bg-surface"
+                        title="Pick custom fill color"
+                      />
+                      <input
+                        type="text"
+                        value={selectedObject.fill || ''}
+                        onChange={(e) => updateSelectedProperty('fill', e.target.value)}
+                        onBlur={handlePropertyChangeComplete}
+                        className="flex-1 text-xs font-mono bg-surface border border-outline-variant px-2 py-1 rounded"
+                        placeholder="#hex or transparent"
+                      />
+                    </div>
                   </div>
                 )}
 
                 {/* Stroke Color control */}
-                <div className="space-y-3">
-                  <label className="text-[10px] text-secondary font-semibold block">Stroke Color</label>
-                  
-                  {/* Presets */}
-                  <div className="grid grid-cols-4 gap-2">
-                    {presetColors.map((col, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => {
-                          updateSelectedProperty('stroke', col.value);
-                          pushHistory(objects);
-                        }}
-                        className={`w-full aspect-square rounded border relative cursor-pointer ${
-                          selectedObject.stroke === col.value ? 'ring-2 ring-primary ring-offset-2' : 'border-outline-variant/60'
-                        }`}
-                        style={{ backgroundColor: col.value }}
-                        title={col.name}
-                      >
-                        {col.value === 'transparent' && (
-                          <div className="absolute inset-0 flex items-center justify-center font-bold text-[9px] text-rose-500">
-                            /
-                          </div>
-                        )}
-                      </button>
-                    ))}
-                  </div>
+                {selectedObject.type !== 'image' && (
+                  <div className="space-y-3">
+                    <label className="text-[10px] text-secondary font-semibold block">Stroke Color</label>
+                    
+                    {/* Presets */}
+                    <div className="grid grid-cols-4 gap-2">
+                      {presetColors.map((col, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => {
+                            updateSelectedProperty('stroke', col.value, true);
+                          }}
+                          className={`w-full aspect-square rounded border relative cursor-pointer ${
+                            selectedObject.stroke === col.value ? 'ring-2 ring-primary ring-offset-2' : 'border-outline-variant/60'
+                          }`}
+                          style={{ backgroundColor: col.value }}
+                          title={col.name}
+                        >
+                          {col.value === 'transparent' && (
+                            <div className="absolute inset-0 flex items-center justify-center font-bold text-[9px] text-rose-500">
+                              /
+                            </div>
+                          )}
+                        </button>
+                      ))}
+                    </div>
 
-                  {/* Custom Hex Stroke */}
-                  <input
-                    type="text"
-                    value={selectedObject.stroke}
-                    onChange={(e) => updateSelectedProperty('stroke', e.target.value)}
-                    onBlur={handlePropertyChangeComplete}
-                    className="w-full text-xs font-mono bg-surface border border-outline-variant px-2 py-1 rounded"
-                  />
-                </div>
+                    {/* Custom Hex Stroke + Visual Picker */}
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={selectedObject.stroke?.startsWith('#') ? selectedObject.stroke : '#00174b'}
+                        onChange={(e) => updateSelectedProperty('stroke', e.target.value)}
+                        onBlur={handlePropertyChangeComplete}
+                        className="w-8 h-7 rounded cursor-pointer border border-outline-variant bg-surface"
+                        title="Pick custom stroke color"
+                      />
+                      <input
+                        type="text"
+                        value={selectedObject.stroke || ''}
+                        onChange={(e) => updateSelectedProperty('stroke', e.target.value)}
+                        onBlur={handlePropertyChangeComplete}
+                        className="flex-1 text-xs font-mono bg-surface border border-outline-variant px-2 py-1 rounded"
+                        placeholder="#hex"
+                      />
+                    </div>
+                  </div>
+                )}
 
                 {/* Dimension Dimensions parameters */}
                 <div className="space-y-4 pt-1 border-t border-outline-variant/20">
