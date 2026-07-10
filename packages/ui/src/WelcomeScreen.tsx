@@ -86,8 +86,8 @@ export default function WelcomeScreen({
           <button onClick={onBackToHome} className="flex items-center gap-3 hover:opacity-80 transition-all cursor-pointer">
             <img
               alt="DrawOS Logo"
-              className="w-8 h-8 rounded"
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5QXkxy3sALdb0x34RktvYkaT9WCSYexYdwzjaq3puW41PwiPRxGfNpmVhwQgw2yGRMvgaPM93bzsB0rGdXewfzjdfO-SLdD6QEMjKUgYqGPcOT8hYrbxpSqFU5dCqwTxD0IV9W_5yp7pX6LJ40VWYlbPDwBCJZJ7OqFaVqa7hjFX2MQJHpOyx_EY_MrC_Eb-UxAcFQhCwN2hUvjqdQc8qzGXQ9AQ7K1oih6hv1IKklWiXv3uT-1AHGoLjmyReV517OFaGB2ZD9OIa"
+              className="w-7 h-7 rounded object-contain"
+              src="/drawos.png"
             />
             <span className="text-sm font-bold text-on-surface tracking-tight">DrawOS</span>
           </button>

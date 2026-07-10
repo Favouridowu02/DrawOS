@@ -208,12 +208,19 @@ export default function LandingPage({ onLaunchEditor, onLaunchWithTemplate }: La
     <div className="bg-[#f9f9ff] text-[#151b2a] font-sans min-h-screen flex flex-col antialiased selection:bg-[#e9edff] selection:text-[#004ac6]">
       {/* Fixed Layout Top Header */}
       <header className="fixed top-0 left-0 right-0 h-[64px] bg-[#f9f9ff]/90 backdrop-blur-md border-b border-[#c3c6d7] flex justify-between items-center px-8 z-50">
-        <div className="flex items-center gap-3">
-          <div className="text-[#004ac6] flex items-center justify-center transition-transform hover:rotate-12 duration-300">
+        <button
+          onClick={() => {
+            setActiveTab('features');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          className="flex items-center gap-3 cursor-pointer focus:outline-none group"
+          title="Return to DrawOS Home"
+        >
+          <div className="text-[#004ac6] flex items-center justify-center transition-transform group-hover:rotate-12 duration-300">
             <DrawOSLogo className="w-7 h-7" />
           </div>
-          <span className="text-base font-bold tracking-tight text-[#151b2a]">DrawOS</span>
-        </div>
+          <span className="text-base font-bold tracking-tight text-[#151b2a] group-hover:text-[#004ac6] transition-colors">DrawOS</span>
+        </button>
 
         {/* Center Tabs Navigation - Removed Pricing */}
         <nav className="hidden md:flex items-center gap-8 h-full relative">
@@ -290,7 +297,7 @@ export default function LandingPage({ onLaunchEditor, onLaunchWithTemplate }: La
                   <ArrowRight className="w-4 h-4" />
                 </button>
                 <a
-                  href="https://github.com"
+                  href="https://github.com/Favouridowu02/DrawOS"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-6 py-3 border border-[#c3c6d7] text-[#151b2a] bg-white hover:bg-[#f1f3ff] rounded-lg transition-all text-sm font-semibold flex items-center gap-2 cursor-pointer hover:border-[#004ac6]"

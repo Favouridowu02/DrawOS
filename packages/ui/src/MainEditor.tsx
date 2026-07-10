@@ -940,11 +940,13 @@ export default function MainEditor({
           
           <div className="w-px h-5 bg-outline-variant/40"></div>
           
-          <img
-            alt="DrawOS Mini Logo"
-            className="w-5.5 h-5.5 rounded object-contain"
-            src="/drawos.png"
-          />
+          <button onClick={onBack} className="cursor-pointer hover:opacity-80 transition-opacity" title="Return to Home">
+            <img
+              alt="DrawOS Mini Logo"
+              className="w-5.5 h-5.5 rounded object-contain"
+              src="/drawos.png"
+            />
+          </button>
           <div className="flex flex-col">
             <span className="text-[11px] font-bold tracking-tight text-on-surface leading-none">{drawing.name}</span>
             <span className="text-[9px] text-secondary font-mono leading-none mt-0.5">Workspace</span>
