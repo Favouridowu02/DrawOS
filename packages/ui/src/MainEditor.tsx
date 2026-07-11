@@ -43,9 +43,6 @@ export default function MainEditor({
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [activeTool, setActiveTool] = useState<ToolType>('select');
 
-  useEffect(() => {
-    setObjects(drawing.objects);
-  }, [drawing.id]);
 
   // Drawing state variables
   const [isDrawing, setIsDrawing] = useState(false);
@@ -188,7 +185,7 @@ export default function MainEditor({
     setSelectedId(null);
     setHistoryPast([]);
     setHistoryFuture([]);
-  }, [drawing]);
+  }, [drawing.id]);
 
   // Color Palette suggestions
   const presetColors = [
