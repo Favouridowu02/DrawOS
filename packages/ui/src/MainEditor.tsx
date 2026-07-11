@@ -1957,79 +1957,148 @@ export default function MainEditor({
                   </div>
                 )}
 
-                {/* Dimension Dimensions parameters */}
-                <div className="space-y-4 pt-1 border-t border-outline-variant/20">
+                {/* Dimension & Position parameters */}
+                <div className="space-y-4 pt-2 border-t border-outline-variant/20">
                   
-                  {/* Stroke Width Slider */}
-                  <div className="space-y-1">
-                    <div className="flex justify-between text-[10px] text-secondary">
-                      <span>Stroke Thickness</span>
-                      <span className="font-mono font-semibold">{selectedObject.strokeWidth}px</span>
+                  {/* Position X / Y */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <label className="text-[10px] text-secondary font-semibold block">Position X</label>
+                      <div className="flex items-center border border-outline-variant rounded px-2 py-1 bg-surface">
+                        <input
+                          type="number"
+                          value={Math.round(selectedObject.x)}
+                          onChange={(e) => updateSelectedProperty('x', parseInt(e.target.value) || 0, true)}
+                          className="w-full text-xs font-mono font-semibold bg-transparent outline-none text-right"
+                        />
+                        <span className="text-[10px] text-secondary ml-1 font-mono">px</span>
+                      </div>
                     </div>
-                    <input
-                      type="range"
-                      min="1"
-                      max="16"
-                      value={selectedObject.strokeWidth}
-                      onChange={(e) => updateSelectedProperty('strokeWidth', parseInt(e.target.value))}
-                      onMouseUp={handlePropertyChangeComplete}
-                      className="w-full accent-primary h-1 rounded bg-outline-variant/40"
-                    />
+                    <div className="space-y-1">
+                      <label className="text-[10px] text-secondary font-semibold block">Position Y</label>
+                      <div className="flex items-center border border-outline-variant rounded px-2 py-1 bg-surface">
+                        <input
+                          type="number"
+                          value={Math.round(selectedObject.y)}
+                          onChange={(e) => updateSelectedProperty('y', parseInt(e.target.value) || 0, true)}
+                          className="w-full text-xs font-mono font-semibold bg-transparent outline-none text-right"
+                        />
+                        <span className="text-[10px] text-secondary ml-1 font-mono">px</span>
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Rectangle Width Slider */}
+                  {/* Stroke Width Slider + Typeable Input */}
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between items-center text-[10px] text-secondary font-semibold">
+                      <span>Stroke Thickness</span>
+                    </div>
+                    <div className="flex items-center gap-2.5">
+                      <input
+                        type="range"
+                        min="1"
+                        max="32"
+                        value={selectedObject.strokeWidth}
+                        onChange={(e) => updateSelectedProperty('strokeWidth', Math.max(1, parseInt(e.target.value) || 1), true)}
+                        className="flex-1 accent-primary h-1.5 rounded bg-outline-variant/40 cursor-pointer"
+                      />
+                      <div className="flex items-center border border-outline-variant rounded px-2 py-1 bg-surface w-20">
+                        <input
+                          type="number"
+                          min="1"
+                          max="200"
+                          value={selectedObject.strokeWidth}
+                          onChange={(e) => updateSelectedProperty('strokeWidth', Math.max(1, parseInt(e.target.value) || 1), true)}
+                          className="w-full text-xs font-mono font-semibold bg-transparent outline-none text-right"
+                        />
+                        <span className="text-[10px] text-secondary ml-1 font-mono">px</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Rectangle/Image Width & Height Slider + Typeable Input */}
                   {(selectedObject.type === 'rectangle' || selectedObject.type === 'image') && (
                     <>
-                      <div className="space-y-1">
-                        <div className="flex justify-between text-[10px] text-secondary">
+                      <div className="space-y-1.5">
+                        <div className="flex justify-between items-center text-[10px] text-secondary font-semibold">
                           <span>Width</span>
-                          <span className="font-mono font-semibold">{selectedObject.width || 0}px</span>
                         </div>
-                        <input
-                          type="range"
-                          min="10"
-                          max="400"
-                          value={selectedObject.width || 10}
-                          onChange={(e) => updateSelectedProperty('width', parseInt(e.target.value))}
-                          onMouseUp={handlePropertyChangeComplete}
-                          className="w-full accent-primary h-1 rounded bg-outline-variant/40"
-                        />
+                        <div className="flex items-center gap-2.5">
+                          <input
+                            type="range"
+                            min="10"
+                            max="800"
+                            value={selectedObject.width || 10}
+                            onChange={(e) => updateSelectedProperty('width', Math.max(1, parseInt(e.target.value) || 10), true)}
+                            className="flex-1 accent-primary h-1.5 rounded bg-outline-variant/40 cursor-pointer"
+                          />
+                          <div className="flex items-center border border-outline-variant rounded px-2 py-1 bg-surface w-20">
+                            <input
+                              type="number"
+                              min="1"
+                              value={selectedObject.width || 10}
+                              onChange={(e) => updateSelectedProperty('width', Math.max(1, parseInt(e.target.value) || 10), true)}
+                              className="w-full text-xs font-mono font-semibold bg-transparent outline-none text-right"
+                            />
+                            <span className="text-[10px] text-secondary ml-1 font-mono">px</span>
+                          </div>
+                        </div>
                       </div>
 
-                      <div className="space-y-1">
-                        <div className="flex justify-between text-[10px] text-secondary">
+                      <div className="space-y-1.5">
+                        <div className="flex justify-between items-center text-[10px] text-secondary font-semibold">
                           <span>Height</span>
-                          <span className="font-mono font-semibold">{selectedObject.height || 0}px</span>
                         </div>
-                        <input
-                          type="range"
-                          min="10"
-                          max="400"
-                          value={selectedObject.height || 10}
-                          onChange={(e) => updateSelectedProperty('height', parseInt(e.target.value))}
-                          onMouseUp={handlePropertyChangeComplete}
-                          className="w-full accent-primary h-1 rounded bg-outline-variant/40"
-                        />
+                        <div className="flex items-center gap-2.5">
+                          <input
+                            type="range"
+                            min="10"
+                            max="800"
+                            value={selectedObject.height || 10}
+                            onChange={(e) => updateSelectedProperty('height', Math.max(1, parseInt(e.target.value) || 10), true)}
+                            className="flex-1 accent-primary h-1.5 rounded bg-outline-variant/40 cursor-pointer"
+                          />
+                          <div className="flex items-center border border-outline-variant rounded px-2 py-1 bg-surface w-20">
+                            <input
+                              type="number"
+                              min="1"
+                              value={selectedObject.height || 10}
+                              onChange={(e) => updateSelectedProperty('height', Math.max(1, parseInt(e.target.value) || 10), true)}
+                              className="w-full text-xs font-mono font-semibold bg-transparent outline-none text-right"
+                            />
+                            <span className="text-[10px] text-secondary ml-1 font-mono">px</span>
+                          </div>
+                        </div>
                       </div>
                     </>
                   )}
 
-                  {/* Circle Radius Slider */}
+                  {/* Circle Radius Slider + Typeable Input */}
                   {selectedObject.type === 'circle' && (
-                    <div className="space-y-1">
-                      <div className="flex justify-between text-[10px] text-secondary">
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between items-center text-[10px] text-secondary font-semibold">
                         <span>Radius Size</span>
-                        <span className="font-mono font-semibold">{selectedObject.radius || 0}px</span>
                       </div>
-                      <input
-                        type="range"
-                        min="5"
-                        max="200"
-                        value={selectedObject.radius || 5}
-                        onChange={(e) => updateSelectedProperty('radius', parseInt(e.target.value))}
-                        onMouseUp={handlePropertyChangeComplete}
-                        className="w-full accent-primary h-1 rounded bg-outline-variant/40"
-                      />
+                      <div className="flex items-center gap-2.5">
+                        <input
+                          type="range"
+                          min="5"
+                          max="400"
+                          value={selectedObject.radius || 5}
+                          onChange={(e) => updateSelectedProperty('radius', Math.max(1, parseInt(e.target.value) || 5), true)}
+                          className="flex-1 accent-primary h-1.5 rounded bg-outline-variant/40 cursor-pointer"
+                        />
+                        <div className="flex items-center border border-outline-variant rounded px-2 py-1 bg-surface w-20">
+                          <input
+                            type="number"
+                            min="1"
+                            value={selectedObject.radius || 5}
+                            onChange={(e) => updateSelectedProperty('radius', Math.max(1, parseInt(e.target.value) || 5), true)}
+                            className="w-full text-xs font-mono font-semibold bg-transparent outline-none text-right"
+                          />
+                          <span className="text-[10px] text-secondary ml-1 font-mono">px</span>
+                        </div>
+                      </div>
                     </div>
                   )}
 
