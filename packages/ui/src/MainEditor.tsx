@@ -59,6 +59,11 @@ export default function MainEditor({
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
+  // Resize state for interactive canvas shape handles
+  const [isResizing, setIsResizing] = useState(false);
+  const [resizeHandle, setResizeHandle] = useState<'se' | 'sw' | 'ne' | 'nw' | 'e' | 's' | 'radius' | null>(null);
+  const [initialResizeBox, setInitialResizeBox] = useState<{ x: number, y: number, width: number, height: number, radius: number }>({ x: 0, y: 0, width: 0, height: 0, radius: 0 });
+
   // History Stack for undo/redo
   const [historyPast, setHistoryPast] = useState<DrawingObject[][]>([]);
   const [historyFuture, setHistoryFuture] = useState<DrawingObject[][]>([]);
@@ -533,6 +538,57 @@ export default function MainEditor({
     let x = snap(coords.x, canvasSettings.gridSize, canvasSettings.snapToGrid);
     let y = snap(coords.y, canvasSettings.gridSize, canvasSettings.snapToGrid);
 
+    if (isResizing && selectedId && resizeHandle) {
+      hasDraggedRef.current = true;
+      const dx = coords.x - startX;
+      const dy = coords.y - startY;
+      const updated = objects.map(obj => {
+        if (obj.id === selectedId) {
+          if (obj.type === 'rectangle' || obj.type === 'image') {
+            let nw = initialResizeBox.width;
+            let nh = initialResizeBox.height;
+            let nx = initialResizeBox.x;
+            let ny = initialResizeBox.y;
+
+            if (resizeHandle === 'se') {
+              nw = Math.max(10, initialResizeBox.width + dx);
+              nh = Math.max(10, initialResizeBox.height + dy);
+            } else if (resizeHandle === 'e') {
+              nw = Math.max(10, initialResizeBox.width + dx);
+            } else if (resizeHandle === 's') {
+              nh = Math.max(10, initialResizeBox.height + dy);
+            } else if (resizeHandle === 'sw') {
+              nw = Math.max(10, initialResizeBox.width - dx);
+              nh = Math.max(10, initialResizeBox.height + dy);
+              nx = initialResizeBox.x + (initialResizeBox.width - nw);
+            } else if (resizeHandle === 'ne') {
+              nw = Math.max(10, initialResizeBox.width + dx);
+              nh = Math.max(10, initialResizeBox.height - dy);
+              ny = initialResizeBox.y + (initialResizeBox.height - nh);
+            } else if (resizeHandle === 'nw') {
+              nw = Math.max(10, initialResizeBox.width - dx);
+              nh = Math.max(10, initialResizeBox.height - dy);
+              nx = initialResizeBox.x + (initialResizeBox.width - nw);
+              ny = initialResizeBox.y + (initialResizeBox.height - nh);
+            }
+            return {
+              ...obj,
+              x: nx,
+              y: ny,
+              width: snap(nw, canvasSettings.gridSize, canvasSettings.snapToGrid),
+              height: snap(nh, canvasSettings.gridSize, canvasSettings.snapToGrid)
+            };
+          } else if (obj.type === 'circle') {
+            const nr = Math.max(5, Math.round(Math.sqrt(Math.pow(coords.x - initialResizeBox.x, 2) + Math.pow(coords.y - initialResizeBox.y, 2))));
+            return { ...obj, radius: snap(nr, canvasSettings.gridSize, canvasSettings.snapToGrid) };
+          }
+        }
+        return obj;
+      });
+      setObjects(updated);
+      return;
+    }
+
     if (isDragging && selectedId) {
       hasDraggedRef.current = true;
       const updated = objects.map(obj => {
@@ -570,6 +626,16 @@ export default function MainEditor({
   const handleMouseUp = () => {
     if (isPanning) {
       setIsPanning(false);
+      return;
+    }
+
+    if (isResizing) {
+      setIsResizing(false);
+      setResizeHandle(null);
+      if (hasDraggedRef.current) {
+        pushHistory(objects);
+        hasDraggedRef.current = false;
+      }
       return;
     }
 
@@ -1631,36 +1697,204 @@ export default function MainEditor({
                         />
                       )}
 
-                      {/* Active object visual outline bound highlight */}
+                      {/* Active object visual outline bound highlight & interactive resize handles */}
                       {isSelected && (
                         <>
-                          {/* Box layout for Rect / Images */}
+                          {/* Box layout & Resize handles for Rect / Images */}
                           {(obj.type === 'rectangle' || obj.type === 'image') && (
-                            <rect
-                              x={obj.x - 2}
-                              y={obj.y - 2}
-                              width={(obj.width || 0) + 4}
-                              height={(obj.height || 0) + 4}
-                              fill="none"
-                              stroke="#004ac6"
-                              strokeWidth="1.5"
-                              strokeDasharray="4 3"
-                              vectorEffect="non-scaling-stroke"
-                            />
+                            <>
+                              <rect
+                                x={obj.x - 2}
+                                y={obj.y - 2}
+                                width={(obj.width || 0) + 4}
+                                height={(obj.height || 0) + 4}
+                                fill="none"
+                                stroke="#004ac6"
+                                strokeWidth="1.5"
+                                strokeDasharray="4 3"
+                                vectorEffect="non-scaling-stroke"
+                              />
+                              {!obj.locked && (
+                                <>
+                                  {/* NW Corner */}
+                                  <rect
+                                    x={obj.x - 5}
+                                    y={obj.y - 5}
+                                    width={10}
+                                    height={10}
+                                    fill="white"
+                                    stroke="#004ac6"
+                                    strokeWidth={2}
+                                    className="cursor-nwse-resize"
+                                    onMouseDown={(e) => {
+                                      e.stopPropagation();
+                                      setIsResizing(true);
+                                      setResizeHandle('nw');
+                                      const coords = getMouseCoords(e);
+                                      setStartX(coords.x);
+                                      setStartY(coords.y);
+                                      setInitialResizeBox({ x: obj.x, y: obj.y, width: obj.width || 10, height: obj.height || 10, radius: 0 });
+                                    }}
+                                  />
+                                  {/* NE Corner */}
+                                  <rect
+                                    x={obj.x + (obj.width || 0) - 5}
+                                    y={obj.y - 5}
+                                    width={10}
+                                    height={10}
+                                    fill="white"
+                                    stroke="#004ac6"
+                                    strokeWidth={2}
+                                    className="cursor-nesw-resize"
+                                    onMouseDown={(e) => {
+                                      e.stopPropagation();
+                                      setIsResizing(true);
+                                      setResizeHandle('ne');
+                                      const coords = getMouseCoords(e);
+                                      setStartX(coords.x);
+                                      setStartY(coords.y);
+                                      setInitialResizeBox({ x: obj.x, y: obj.y, width: obj.width || 10, height: obj.height || 10, radius: 0 });
+                                    }}
+                                  />
+                                  {/* SW Corner */}
+                                  <rect
+                                    x={obj.x - 5}
+                                    y={obj.y + (obj.height || 0) - 5}
+                                    width={10}
+                                    height={10}
+                                    fill="white"
+                                    stroke="#004ac6"
+                                    strokeWidth={2}
+                                    className="cursor-nesw-resize"
+                                    onMouseDown={(e) => {
+                                      e.stopPropagation();
+                                      setIsResizing(true);
+                                      setResizeHandle('sw');
+                                      const coords = getMouseCoords(e);
+                                      setStartX(coords.x);
+                                      setStartY(coords.y);
+                                      setInitialResizeBox({ x: obj.x, y: obj.y, width: obj.width || 10, height: obj.height || 10, radius: 0 });
+                                    }}
+                                  />
+                                  {/* SE Corner */}
+                                  <rect
+                                    x={obj.x + (obj.width || 0) - 5}
+                                    y={obj.y + (obj.height || 0) - 5}
+                                    width={10}
+                                    height={10}
+                                    fill="white"
+                                    stroke="#004ac6"
+                                    strokeWidth={2}
+                                    className="cursor-nwse-resize"
+                                    onMouseDown={(e) => {
+                                      e.stopPropagation();
+                                      setIsResizing(true);
+                                      setResizeHandle('se');
+                                      const coords = getMouseCoords(e);
+                                      setStartX(coords.x);
+                                      setStartY(coords.y);
+                                      setInitialResizeBox({ x: obj.x, y: obj.y, width: obj.width || 10, height: obj.height || 10, radius: 0 });
+                                    }}
+                                  />
+                                  {/* E Edge */}
+                                  <rect
+                                    x={obj.x + (obj.width || 0) - 5}
+                                    y={obj.y + (obj.height || 0) / 2 - 5}
+                                    width={10}
+                                    height={10}
+                                    fill="white"
+                                    stroke="#004ac6"
+                                    strokeWidth={2}
+                                    className="cursor-ew-resize"
+                                    onMouseDown={(e) => {
+                                      e.stopPropagation();
+                                      setIsResizing(true);
+                                      setResizeHandle('e');
+                                      const coords = getMouseCoords(e);
+                                      setStartX(coords.x);
+                                      setStartY(coords.y);
+                                      setInitialResizeBox({ x: obj.x, y: obj.y, width: obj.width || 10, height: obj.height || 10, radius: 0 });
+                                    }}
+                                  />
+                                  {/* S Edge */}
+                                  <rect
+                                    x={obj.x + (obj.width || 0) / 2 - 5}
+                                    y={obj.y + (obj.height || 0) - 5}
+                                    width={10}
+                                    height={10}
+                                    fill="white"
+                                    stroke="#004ac6"
+                                    strokeWidth={2}
+                                    className="cursor-ns-resize"
+                                    onMouseDown={(e) => {
+                                      e.stopPropagation();
+                                      setIsResizing(true);
+                                      setResizeHandle('s');
+                                      const coords = getMouseCoords(e);
+                                      setStartX(coords.x);
+                                      setStartY(coords.y);
+                                      setInitialResizeBox({ x: obj.x, y: obj.y, width: obj.width || 10, height: obj.height || 10, radius: 0 });
+                                    }}
+                                  />
+                                </>
+                              )}
+                            </>
                           )}
 
-                          {/* Circular layout for circles */}
+                          {/* Circular layout & Resize handles for circles */}
                           {obj.type === 'circle' && (
-                            <circle
-                              cx={obj.x}
-                              cy={obj.y}
-                              r={(obj.radius || 0) + 3}
-                              fill="none"
-                              stroke="#004ac6"
-                              strokeWidth="1.5"
-                              strokeDasharray="4 3"
-                              vectorEffect="non-scaling-stroke"
-                            />
+                            <>
+                              <circle
+                                cx={obj.x}
+                                cy={obj.y}
+                                r={(obj.radius || 0) + 3}
+                                fill="none"
+                                stroke="#004ac6"
+                                strokeWidth="1.5"
+                                strokeDasharray="4 3"
+                                vectorEffect="non-scaling-stroke"
+                              />
+                              {!obj.locked && (
+                                <>
+                                  <circle
+                                    cx={obj.x + (obj.radius || 0)}
+                                    cy={obj.y}
+                                    r={5}
+                                    fill="white"
+                                    stroke="#004ac6"
+                                    strokeWidth={2}
+                                    className="cursor-ew-resize"
+                                    onMouseDown={(e) => {
+                                      e.stopPropagation();
+                                      setIsResizing(true);
+                                      setResizeHandle('radius');
+                                      const coords = getMouseCoords(e);
+                                      setStartX(coords.x);
+                                      setStartY(coords.y);
+                                      setInitialResizeBox({ x: obj.x, y: obj.y, width: 0, height: 0, radius: obj.radius || 10 });
+                                    }}
+                                  />
+                                  <circle
+                                    cx={obj.x}
+                                    cy={obj.y + (obj.radius || 0)}
+                                    r={5}
+                                    fill="white"
+                                    stroke="#004ac6"
+                                    strokeWidth={2}
+                                    className="cursor-ns-resize"
+                                    onMouseDown={(e) => {
+                                      e.stopPropagation();
+                                      setIsResizing(true);
+                                      setResizeHandle('radius');
+                                      const coords = getMouseCoords(e);
+                                      setStartX(coords.x);
+                                      setStartY(coords.y);
+                                      setInitialResizeBox({ x: obj.x, y: obj.y, width: 0, height: 0, radius: obj.radius || 10 });
+                                    }}
+                                  />
+                                </>
+                              )}
+                            </>
                           )}
 
                           {/* Text bounding helper */}
